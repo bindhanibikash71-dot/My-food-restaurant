@@ -1,0 +1,6 @@
+{
+  "name": "MYFOOD",
+  "description": "A production-ready food delivery web application.",
+  "requestFramePermissions": ["geolocation"],
+  "majorCapabilities": []
+}

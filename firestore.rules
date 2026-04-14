@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: users
+    // Document ID: {userId}
+    // Fields:
+    //   - email: string (required)
+    //   - displayName: string (optional)
+    //   - phoneNumber: string (optional)
+    //   - location: map (optional)
+    //   - role: string (optional, 'admin', 'user', 'driver')
+    //
+    // Collection: menu
+    // Document ID: {dishId}
+    // Fields:
+    //   - name: string (required)
+    //   - description: string (optional)
+    //   - price: number (required)
+    //   - category: string (optional)
+    //   - imageUrl: string (optional)
+    //
+    // Collection: settings
+    // Document ID: logo
+    // Fields:
+    //   - url: string (required)
+    //
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+       return request.auth != null;
+    }
+
+    function isOwner(userId) {
+       return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      // Check if user document exists and has admin role, OR if email matches
+      let userDoc = get(/databases/$(database)/documents/users/$(request.auth.uid));
+      return isAuthenticated() &&
+        ((userDoc.exists() && userDoc.data().role == 'admin') ||
+          (request.auth.token.email == "bindhanibikash71@gmail.com"));
+    }
+
+    // ===============================================================
+    // Match Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId);
+      allow update: if isOwner(userId) || isAdmin();
+    }
+
+    match /menu/{dishId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/logo {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

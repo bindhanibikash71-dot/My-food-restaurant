@@ -1,0 +1,44 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile information",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "phoneNumber": { "type": "string" },
+        "location": { "type": "object" },
+        "role": { "type": "string", "enum": ["admin", "user", "driver"] }
+      },
+      "required": ["email"]
+    },
+    "Dish": {
+      "title": "Dish",
+      "description": "Menu item",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "number" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["name", "price"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "User" },
+      "description": "User profiles"
+    },
+    "/menu/{dishId}": {
+      "schema": { "$ref": "Dish" },
+      "description": "Menu items"
+    },
+    "/settings/logo": {
+      "schema": { "type": "object", "properties": { "url": { "type": "string" } } },
+      "description": "App settings"
+    }
+  }
+}
